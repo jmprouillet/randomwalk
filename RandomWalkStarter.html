@@ -20,18 +20,22 @@ function initialize(){
 	WIDTH = canvas.width;
 	HEIGHT= canvas.height;
 	color = 'green';
-	var n = 1,i,x,y,dx=0,dy=0,p; 
+	var n = 10,i,x,y,dx=0,dy=0,p;
 
-	// build particles			
+	// build particles
 	for (i = 0; i < n; i+=1) {
 		x = 0.5 *WIDTH;
-		y = 0.5 *HEIGHT;	
-		p = Particle(x,y,dx,dy);
+		y = 0.5 *HEIGHT;
+		red = 255*Math.random();
+		green = 255*Math.random();
+		blue = 255*Math.random();
+		color = 'rgb('+red+','+green+','+blue+')';
+		p = Particle(x,y,dx,dy,color);
 		particles.push(p);
 	}
 }
-function Particle(x,y,dx,dy){
-	return {x:x,y:y,dx:dx,dy:dy};
+function Particle(x,y,dx,dy, color){
+	return {x:x,y:y,dx:dx,dy:dy,color:color};
 }
 
 function updateParticles() {
@@ -44,23 +48,33 @@ function updateParticles() {
 
 		start.x = p.x; start.y = p.y;
 		// at present this is a random step size
-		p.dx = diffusionDistance*Math.random(); 
-		p.dy = diffusionDistance*Math.random();
-		checkWallCollision(p);
-		
+		p.dx = diffusionDistance*(2*Math.random()-1);
+		p.dy = diffusionDistance*(2*Math.random()-1);
+		checkWallCollision(p,WIDTH,HEIGHT);
+
 		p.x += p.dx; p.y += p.dy;
-		DrawCircle(p.x,p.y,color);
+		DrawCircle(p.x,p.y,p.color);
 		DrawLine(start.x,start.y,p.x,p.y);
-	}		
+	}
 	DrawRect(0,0,WIDTH,HEIGHT);
 }
-var checkWallCollision = function(p){
+var checkWallCollision = function(p,width,height){
 	/* make particle bounce off walls
 		enter code here
-	*/
-	
+	*/if(p.x+p.dx>width){
+			p.dx = -p.dx;
+		}
+		if(p.x+p.dx<0){
+			p.dx = -p.dx;
+		}
+		if(p.y+p.dy>height){
+				p.dy = -p.dy;
+			}
+			if(p.y+p.dy<0){
+				p.dy = -p.dy;
+			}
 };
-/*        
+/*
 	function normalize(x,y){
 		// calculate len here to normalize the vector
 		//return {x:x/len,y:y/len};  // return a unit vector
@@ -70,7 +84,7 @@ var checkWallCollision = function(p){
 	function DrawCircle(x,y,color){
 		context.fillStyle = color;
 		context.beginPath();
-		context.arc(x, y, 2, 0, Math.PI*2, true);
+		context.arc(x, y, 5, 0, Math.PI*2, true);
 		context.closePath();
 		context.fill();
 	}
@@ -87,17 +101,17 @@ var checkWallCollision = function(p){
 		context.beginPath();
 		context.moveTo(x1,y1);
 		context.lineTo(x2,y2);
-		
+
 		context.fill();
 		context.stroke();
 		context.closePath();
-	}			
+	}
  	function RunPhysics(){timer = setInterval(updateParticles,100); // calls Run every xxx ms
   }
 
   function ResetTimer(){
     if(timer!== null){
-      clearInterval(timer); 
+      clearInterval(timer);
       timer = null;
     }
   }
